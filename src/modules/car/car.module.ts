@@ -1,14 +1,13 @@
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { CarEntity } from './entities/car.entity';
-import { CarController } from './car.controller';
-import { CarService } from './car.service';
-import { UserModule } from '../user/user.module';
+import { Module } from "@nestjs/common";
+import { CarController } from "./car.controller";
+import { CarService } from "./car.service";
+import { UserModule } from "../user/user.module";
+import { DatabaseModule } from '../../database/database.module';
 
 @Module({
     imports: [
         UserModule,
-        TypeOrmModule.forFeature([CarEntity])
+        DatabaseModule
     ],
     controllers: [CarController],
     providers: [CarService]

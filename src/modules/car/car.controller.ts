@@ -5,8 +5,8 @@ import { UpdateCarDto } from './dto/update-car.dto';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CarEntity } from './entities/car.entity';
 
-@ApiTags('car')
-@Controller('car')
+@ApiTags('cars')
+@Controller('cars')
 export class CarController {
     constructor(private readonly carService: CarService) {}
 

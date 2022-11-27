@@ -1,35 +1,69 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from './entities/user.entity';
-import { DeleteResult, Repository, UpdateResult } from 'typeorm';
-import { defer, Observable } from 'rxjs';
+import { Inject, Injectable, OnModuleInit } from "@nestjs/common";
+import { CreateUserDto } from "./dto/create-user.dto";
+import { UpdateUserDto } from "./dto/update-user.dto";
+import { UserEntity } from "./entities/user.entity";
+import { PG_CONNECTION } from "../../database/database.module";
 
 @Injectable()
-export class UserService {
-    constructor(
-        @InjectRepository(UserEntity)
-        private usersRepository: Repository<UserEntity>
-    ) {}
+export class UserService implements OnModuleInit {
+    constructor(@Inject(PG_CONNECTION) private conn: any) {}
 
-    create(createUserDto: CreateUserDto): Observable<UserEntity> {
-        return defer(() => this.usersRepository.save(createUserDto));
+    async create(createUserDto: CreateUserDto) {
+        await this.conn.query(
+            `INSERT INTO "users" (username, first_name, last_name)
+             VALUES ($1, $2, $3)`,
+            [
+                createUserDto.username,
+                createUserDto.firstName,
+                createUserDto.lastName
+            ]
+        );
     }
 
-    findAll(): Observable<UserEntity[]> {
-        return defer(() => this.usersRepository.find());
+    async findAll(): Promise<UserEntity[]> {
+        const users = await this.conn.query('SELECT * FROM users');
+        return users.rows;
     }
 
-    findOne(id: number): Observable<UserEntity> {
-        return defer(() => this.usersRepository.findOneBy({id}));
+    async findOne(id: number): Promise<UserEntity> {
+        const user = await this.conn.query(`SELECT *
+                                            FROM users
+                                            WHERE id = ${ id }`);
+        return user.rows[0];
     }
 
-    update(id: number, updateUserDto: UpdateUserDto): Observable<UpdateResult> {
-        return defer(() => this.usersRepository.update(id, updateUserDto));
+    async update(id: number, updateUserDto: UpdateUserDto) {
+        await this.conn.query(`UPDATE users
+                               SET "username"= $1,
+                                   first_name= $2,
+                                   last_name= $3
+                               WHERE id = ${ id }`,
+            [
+                updateUserDto.username,
+                updateUserDto.firstName,
+                updateUserDto.lastName
+            ]);
+        return;
     }
 
-    remove(id: number): Observable<DeleteResult> {
-        return defer(() => this.usersRepository.delete({id}));
+    async remove(id: number) {
+        await this.conn.query(`DELETE
+                               FROM users
+                               WHERE id = ${ id }`);
+        return;
+    }
+
+    onModuleInit(): void {
+        const query = `
+            CREATE TABLE IF NOT EXISTS "users"
+            (
+                "id"         SERIAL,
+                "createdAt"  timestamp DEFAULT CURRENT_TIMESTAMP,
+                "username"   VARCHAR(255) NOT NULL,
+                "first_name" VARCHAR(255) NOT NULL,
+                "last_name"  VARCHAR(255) NOT NULL,
+                PRIMARY KEY ("id")
+            );`;
+        this.conn.query(query);
     }
 }
