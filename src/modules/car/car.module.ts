@@ -1,8 +1,9 @@
 import { Module } from "@nestjs/common";
 import { CarController } from "./car.controller";
-import { CarService } from "./car.service";
+import { CarService } from "./services/car.service";
 import { UserModule } from "../user/user.module";
-import { DatabaseModule } from '../../database/database.module';
+import { DatabaseModule } from '../../common/database/database.module';
+import { CarUpdatesWebsocketService } from './services/car-updates.websocket.service';
 
 @Module({
     imports: [
@@ -10,6 +11,9 @@ import { DatabaseModule } from '../../database/database.module';
         DatabaseModule
     ],
     controllers: [CarController],
-    providers: [CarService]
+    providers: [
+        CarService,
+        CarUpdatesWebsocketService
+    ]
 })
 export class CarModule {}

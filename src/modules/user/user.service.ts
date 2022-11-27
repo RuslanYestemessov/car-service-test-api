@@ -2,7 +2,7 @@ import { Inject, Injectable, OnModuleInit } from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { UserEntity } from "./entities/user.entity";
-import { PG_CONNECTION } from "../../database/database.module";
+import { PG_CONNECTION } from "../../common/database/database.module";
 
 @Injectable()
 export class UserService implements OnModuleInit {

@@ -1,10 +1,11 @@
 import { HttpException, HttpStatus, Inject, Injectable, OnModuleInit } from "@nestjs/common";
-import { CreateCarDto } from "./dto/create-car.dto";
-import { UpdateCarDto } from "./dto/update-car.dto";
-import { CarEntity } from "./entities/car.entity";
-import { UserService } from "../user/user.service";
+import { CreateCarDto } from "../dto/create-car.dto";
+import { UpdateCarDto } from "../dto/update-car.dto";
+import { CarEntity } from "../entities/car.entity";
+import { UserService } from "../../user/user.service";
 import { Observable } from "rxjs";
-import { PG_CONNECTION } from "../../database/database.module";
+import { PG_CONNECTION } from "../../../common/database/database.module";
+import { CarInfoUpdateDto } from '../dto/car-info-update.dto';
 
 @Injectable()
 export class CarService implements OnModuleInit {
@@ -34,11 +35,11 @@ export class CarService implements OnModuleInit {
         return cars.rows;
     }
 
-    findAll(): Observable<CarEntity[]> {
+    findAll(): Promise<CarEntity[]> {
         return this.conn.query('SELECT * FROM cars');
     }
 
-    findOne(id: number): Observable<CarEntity> {
+    findOne(id: number): Promise<CarEntity> {
         return this.conn.query(`SELECT *
                                 FROM cars
                                 WHERE id = ${ id }`);
@@ -62,11 +63,21 @@ export class CarService implements OnModuleInit {
         ]);
     }
 
-    remove(id: number) {
-        this.conn.query(`DELETE
-                         FROM users
-                         WHERE id = ${ id }`);
+    async infoUpdate(dto: CarInfoUpdateDto) {
+        await this.conn.query(`
+            UPDATE cars
+            SET "remainingFuel"=$1,
+                coordinates=$2
+            WHERE id = ${ dto.id }
+        `);
         return;
+    }
+
+    async remove(id: number) {
+        await this.conn.query(`DELETE
+                               FROM users
+                               WHERE id = ${ id }`);
+        return id;
     }
 
     onModuleInit(): any {
