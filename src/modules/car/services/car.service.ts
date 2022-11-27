@@ -5,7 +5,7 @@ import { CarEntity } from "../entities/car.entity";
 import { UserService } from "../../user/user.service";
 import { Observable } from "rxjs";
 import { PG_CONNECTION } from "../../../common/database/database.module";
-import { CarInfoUpdateDto } from '../dto/car-info-update.dto';
+import { CarInfoUpdateDto } from "../dto/car-info-update.dto";
 
 @Injectable()
 export class CarService implements OnModuleInit {
@@ -22,8 +22,9 @@ export class CarService implements OnModuleInit {
             throw new HttpException('User not found', HttpStatus.NOT_FOUND);
         }
         const cars = await this.conn.query(`
-                INSERT INTO cars ("userId", title, brand, model, "governmentNumber", "fuelCapability")
-                VALUES ($1, $2, $3, $4, $5, $6)`,
+                INSERT INTO cars ("userId", title, brand, model, "governmentNumber", "fuelCapability", "maintenanceEvery",
+                                  "lastCarMaintenance")
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
             [
                 createCarDto.userId,
                 createCarDto.title,
@@ -43,6 +44,22 @@ export class CarService implements OnModuleInit {
         return this.conn.query(`SELECT *
                                 FROM cars
                                 WHERE id = ${ id }`);
+    }
+
+    async getCarFuelInfo(id: number) {
+        const data = await this.conn.query(`SELECT ("fuelCapability", "remainingFuel")
+                                            FROM cars
+                                            WHERE id = ${ id }`);
+        return data.rows;
+    }
+
+    async getCarMaintenanceInfo(id: number) {
+        const data = await this.conn.query(`
+            SELECT ("maintenanceEvery", "lastCarMaintenance")
+            FROM cars
+            WHERE id = ${ id }
+        `);
+        return data.rows;
     }
 
     update(id: number, updateCarDto: UpdateCarDto): Observable<any> {
@@ -82,18 +99,20 @@ export class CarService implements OnModuleInit {
 
     onModuleInit(): any {
         const query = `
-            CREATE TABLE IF NOT EXISTS "cars"
+            CREATE TABLE IF NOT EXISTS cars
             (
-                "id"               SERIAL,
-                "userId"           int          NOT NULL,
-                "createdAt"        timestamp DEFAULT CURRENT_TIMESTAMP,
-                "title"            VARCHAR(255) NOT NULL,
-                "brand"            VARCHAR(255) NOT NULL,
-                "model"            VARCHAR(255) NOT NULL,
-                "governmentNumber" VARCHAR(255) NOT NULL,
-                "fuelCapability"   int          NOT NULL,
-                "remainingFuel"    int,
-                "coordinates"      jsonb,
+                "id"                 SERIAL,
+                "userId"             INT          NOT NULL,
+                "createdAt"          timestamp DEFAULT CURRENT_TIMESTAMP,
+                "title"              VARCHAR(255) NOT NULL,
+                "brand"              VARCHAR(255) NOT NULL,
+                "model"              VARCHAR(255) NOT NULL,
+                "governmentNumber"   VARCHAR(255) NOT NULL,
+                "fuelCapability"     INT          NOT NULL,
+                "remainingFuel"      INT,
+                "maintenanceEvery"   INT          NOT NULL,
+                "lastCarMaintenance" INT          NOT NULL,
+                "coordinates"        JSONB,
                 PRIMARY KEY ("id"),
                 FOREIGN KEY ("userId") REFERENCES users (id) ON DELETE SET NULL
             );`;

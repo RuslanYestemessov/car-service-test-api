@@ -14,6 +14,7 @@ import { CarUpdatesWebsocketService } from './services/car-updates.websocket.ser
     providers: [
         CarService,
         CarUpdatesWebsocketService
-    ]
+    ],
+    exports: [CarService]
 })
 export class CarModule {}

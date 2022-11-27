@@ -4,6 +4,7 @@ import { CarModule } from "./modules/car/car.module";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { DatabaseModule } from "./common/database/database.module";
 import { RabbitMQModule } from "@golevelup/nestjs-rabbitmq";
+import { WidgetsModule } from './widgets/widgets.module';
 
 @Module({
     imports: [
@@ -25,7 +26,8 @@ import { RabbitMQModule } from "@golevelup/nestjs-rabbitmq";
             }),
             inject: [ConfigService]
         }),
-        DatabaseModule
+        DatabaseModule,
+        WidgetsModule
     ]
 })
 export class AppModule {}
