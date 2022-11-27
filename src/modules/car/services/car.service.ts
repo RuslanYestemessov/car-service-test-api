@@ -31,7 +31,9 @@ export class CarService {
                 createCarDto.brand,
                 createCarDto.model,
                 createCarDto.governmentNumber,
-                createCarDto.fuelCapability
+                createCarDto.fuelCapability,
+                createCarDto.maintenanceEvery,
+                createCarDto.lastCarMaintenance
             ]);
         return cars.rows;
     }
