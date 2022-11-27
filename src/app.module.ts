@@ -4,7 +4,8 @@ import { CarModule } from "./modules/car/car.module";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { DatabaseModule } from "./common/database/database.module";
 import { RabbitMQModule } from "@golevelup/nestjs-rabbitmq";
-import { WidgetsModule } from './widgets/widgets.module';
+import { WidgetsModule } from "./widgets/widgets.module";
+import { DatabaseInitService } from "./common/database/database-init.service";
 
 @Module({
     imports: [
@@ -19,7 +20,7 @@ import { WidgetsModule } from './widgets/widgets.module';
                 ) }:${ configService.get(
                     'RABBIT_MQ_PASSWORD'
                 ) }@${ configService.get(
-                    'RABBIT_MQ_HOST'
+                    'QUEUE_HOST'
                 ) }:${ configService.get(
                     'RABBIT_MQ_PORT'
                 ) }`
@@ -28,6 +29,7 @@ import { WidgetsModule } from './widgets/widgets.module';
         }),
         DatabaseModule,
         WidgetsModule
-    ]
+    ],
+    providers: [DatabaseInitService]
 })
 export class AppModule {}

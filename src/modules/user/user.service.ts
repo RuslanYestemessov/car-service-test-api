@@ -1,11 +1,11 @@
-import { Inject, Injectable, OnModuleInit } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { UserEntity } from "./entities/user.entity";
 import { PG_CONNECTION } from "../../common/database/database.module";
 
 @Injectable()
-export class UserService implements OnModuleInit {
+export class UserService {
     constructor(@Inject(PG_CONNECTION) private conn: any) {}
 
     async create(createUserDto: CreateUserDto) {
@@ -51,19 +51,5 @@ export class UserService implements OnModuleInit {
                                FROM users
                                WHERE id = ${ id }`);
         return;
-    }
-
-    onModuleInit(): void {
-        const query = `
-            CREATE TABLE IF NOT EXISTS "users"
-            (
-                "id"         SERIAL,
-                "createdAt"  timestamp DEFAULT CURRENT_TIMESTAMP,
-                "username"   VARCHAR(255) NOT NULL,
-                "first_name" VARCHAR(255) NOT NULL,
-                "last_name"  VARCHAR(255) NOT NULL,
-                PRIMARY KEY ("id")
-            );`;
-        this.conn.query(query);
     }
 }

@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Inject, Injectable, OnModuleInit } from "@nestjs/common";
+import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { CreateCarDto } from "../dto/create-car.dto";
 import { UpdateCarDto } from "../dto/update-car.dto";
 import { CarEntity } from "../entities/car.entity";
@@ -8,7 +8,7 @@ import { PG_CONNECTION } from "../../../common/database/database.module";
 import { CarInfoUpdateDto } from "../dto/car-info-update.dto";
 
 @Injectable()
-export class CarService implements OnModuleInit {
+export class CarService {
     constructor(
         @Inject(PG_CONNECTION)
         private readonly conn: any,
@@ -95,27 +95,5 @@ export class CarService implements OnModuleInit {
                                FROM users
                                WHERE id = ${ id }`);
         return id;
-    }
-
-    onModuleInit(): any {
-        const query = `
-            CREATE TABLE IF NOT EXISTS cars
-            (
-                "id"                 SERIAL,
-                "userId"             INT          NOT NULL,
-                "createdAt"          timestamp DEFAULT CURRENT_TIMESTAMP,
-                "title"              VARCHAR(255) NOT NULL,
-                "brand"              VARCHAR(255) NOT NULL,
-                "model"              VARCHAR(255) NOT NULL,
-                "governmentNumber"   VARCHAR(255) NOT NULL,
-                "fuelCapability"     INT          NOT NULL,
-                "remainingFuel"      INT,
-                "maintenanceEvery"   INT          NOT NULL,
-                "lastCarMaintenance" INT          NOT NULL,
-                "coordinates"        JSONB,
-                PRIMARY KEY ("id"),
-                FOREIGN KEY ("userId") REFERENCES users (id) ON DELETE SET NULL
-            );`;
-        this.conn.query(query);
     }
 }

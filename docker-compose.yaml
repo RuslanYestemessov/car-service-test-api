@@ -33,6 +33,7 @@ services:
   car_api_rabbitmq:
     container_name: car_api_rabbit
     image: rabbitmq:3-management-alpine
+    hostname: rabbit
     environment:
       - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER:-admin}
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS:-admin}
