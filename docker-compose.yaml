@@ -6,7 +6,7 @@ services:
     image: node_app
     build: ./
     command: >
-      bash -c "npm run start"
+      bash -c "sleep 10s && npm run start"
     env_file:
       - .env
     ports:
